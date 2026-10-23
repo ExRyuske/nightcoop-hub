@@ -18,6 +18,9 @@ docker compose up -d --build
 docker compose logs hub | grep fingerprint
 ```
 
+Without building on the server: `NIGHTCOOP_IMAGE=ghcr.io/exryuske/nightcoop-hub:latest` in `.env`, then
+`docker compose pull && docker compose up -d --no-build` — the image GitHub builds from this repository (amd64, arm64).
+
 Open UDP **47800** and **47810–47873**, then give your players the address with the fingerprint, for example
 `hub.example.org#K3QF-9X2M-TV7A-0D4R`. In the game: the mod menu "Co-op" → "Server: …" → "Add an own server".
 
@@ -31,6 +34,7 @@ Open UDP **47800** and **47810–47873**, then give your players the address wit
 | `tools/hub/main.cpp` | the hub program (`nightcoop_hub`) |
 | `src/` | the hub server, transport crypto and log |
 | `tools/hub/docker/` | Dockerfile, Compose file, settings example and the guide |
+| `.github/workflows/docker.yml` | builds the image on GitHub and publishes it to `ghcr.io/exryuske/nightcoop-hub` |
 | `vendor/monocypher/` | Monocypher 4.0.2 — BSD-2-Clause or CC0 1.0 (`LICENCE.md`) |
 
 ENet is not stored here: the build fetches the exact commit it is tested with from https://github.com/lsalzman/enet.

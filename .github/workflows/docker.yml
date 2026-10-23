@@ -1,0 +1,65 @@
+# The hub's Docker image, built on GitHub so that a server only pulls it (tools/hub/docker/README.md, section 2).
+# linux/amd64 and linux/arm64, each on its own native runner; the build attestations are signed.
+#
+#   push to main            -> ghcr.io/<owner>/nightcoop-hub:latest and :sha-<commit>
+#   tag v1.2.3 (or 1.2.3)   -> :1.2.3 and :1.2
+#   pull request            -> built, nothing published
+name: docker
+
+on:
+  push:
+    branches: [main]
+    tags: ['v[0-9]*', '[0-9]*']
+    # The files the image is built from (tags are built whatever they change)
+    paths:
+      - src/**
+      - vendor/monocypher/**
+      - tools/hub/main.cpp
+      - tools/hub/docker/Dockerfile*
+      - .github/workflows/docker.yml
+  pull_request:
+    paths:
+      - src/**
+      - vendor/monocypher/**
+      - tools/hub/main.cpp
+      - tools/hub/docker/Dockerfile*
+      - .github/workflows/docker.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# main: one build at a time, the newest commit waits and wins (:latest never goes back); a pull request — the newest only
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  image:
+    uses: docker/github-builder/.github/workflows/build.yml@cbc9d42f8c89a55623392aadd03600965b80e963 # v1.18.1
+    permissions:
+      contents: read  # fetch the sources
+      packages: write # push to ghcr.io
+      id-token: write # sign the attestations with the GitHub OIDC token
+    with:
+      output: image
+      push: ${{ github.event_name != 'pull_request' }}
+      platforms: linux/amd64,linux/arm64
+      file: tools/hub/docker/Dockerfile
+      cache: true
+      cache-mode: max
+      set-meta-labels: true
+      meta-images: ghcr.io/${{ github.repository }}
+      # :latest follows main only, a version tag on an older commit does not move it
+      meta-flavor: latest=false
+      meta-tags: |
+        type=raw,value=latest,enable={{is_default_branch}}
+        type=sha,enable={{is_default_branch}}
+        type=semver,pattern={{version}}
+        type=semver,pattern={{major}}.{{minor}}
+        type=ref,event=pr
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
