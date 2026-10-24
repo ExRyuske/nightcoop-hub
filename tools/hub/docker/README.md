@@ -32,19 +32,10 @@ What the hub sees and what it does not:
 From the hub's source folder (the NightCoop repository or the hub source bundle — both have the same layout):
 
 ```sh
-cd tools/hub/docker
+git clone https://github.com/ExRyuske/nightcoop-hub.git
+cd ./nightcoop-hub/tools/hub/docker
 cp .env.example .env          # optional: port, threads, name, region
-docker compose up -d --build
-```
-
-**Without building on the server** — the ready image. GitHub builds it from this repository on every change, for
-linux/amd64 and linux/arm64: `ghcr.io/exryuske/nightcoop-hub` (`:latest` follows the main branch, `:1.2.3` are releases,
-`:sha-<commit>` is every build). Use it only if you trust its publisher. Name it in `.env` and pull it instead of building:
-
-```sh
-echo 'NIGHTCOOP_IMAGE=ghcr.io/exryuske/nightcoop-hub:latest' >> .env
-docker compose pull
-docker compose up -d --no-build
+docker compose up -d
 ```
 
 On the first start the hub creates its key in the `nightcoop-hub-data` volume and prints its fingerprint:

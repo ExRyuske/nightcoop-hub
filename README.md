@@ -12,14 +12,12 @@ This repository holds only what the hub is built from. The mod itself is not her
 ## Quick start (Docker)
 
 ```sh
-cd tools/hub/docker
+git clone https://github.com/ExRyuske/nightcoop-hub.git
+cd ./nightcoop-hub/tools/hub/docker
 cp .env.example .env          # optional: port, threads, name, region
-docker compose up -d --build
+docker compose up -d
 docker compose logs hub | grep fingerprint
 ```
-
-Without building on the server: `NIGHTCOOP_IMAGE=ghcr.io/exryuske/nightcoop-hub:latest` in `.env`, then
-`docker compose pull && docker compose up -d --no-build` — the image GitHub builds from this repository (amd64, arm64).
 
 Open UDP **47800** and **47810–47873**, then give your players the address with the fingerprint, for example
 `hub.example.org#K3QF-9X2M-TV7A-0D4R`. In the game: the mod menu "Co-op" → "Server: …" → "Add an own server".

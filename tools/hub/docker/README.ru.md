@@ -30,19 +30,10 @@
 Из каталога исходников хаба (репозиторий NightCoop или архив исходников хаба — устроены одинаково):
 
 ```sh
-cd tools/hub/docker
+git clone https://github.com/ExRyuske/nightcoop-hub.git
+cd ./nightcoop-hub/tools/hub/docker
 cp .env.example .env          # по желанию: порт, потоки, имя, регион
-docker compose up -d --build
-```
-
-**Без сборки на сервере** — готовый образ. GitHub собирает его из этого репозитория при каждом изменении, для linux/amd64 и
-linux/arm64: `ghcr.io/exryuske/nightcoop-hub` (`:latest` — ветка main, `:1.2.3` — выпуски, `:sha-<коммит>` — каждая сборка).
-Берите его, только если доверяете издателю. Укажите образ в `.env` и скачайте его вместо сборки:
-
-```sh
-echo 'NIGHTCOOP_IMAGE=ghcr.io/exryuske/nightcoop-hub:latest' >> .env
-docker compose pull
-docker compose up -d --no-build
+docker compose up -d
 ```
 
 При первом запуске хаб создаёт свой ключ в томе `nightcoop-hub-data` и пишет отпечаток:
